@@ -1,17 +1,14 @@
 #pragma once
 
+#include "Cell.h"
 #include <iostream>
 
-class Cell
+class RocketCell : public Cell
 {
 public:
-    Cell(char _value = ' ');
+    RocketCell();
+    RocketCell(char _value);
 
     char GetValue();
     void SetValue(char _value);
-
-    virtual void Pop();
-
-protected:
-    char value;
 };
