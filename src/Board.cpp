@@ -1,7 +1,5 @@
 #include "header/Board.h"
 
-using namespace std;
-
 Board::Board(int _width, int _height)
 {
     this->width = _width;
@@ -28,6 +26,11 @@ void Board::SetCell(int _x, int _y, Cell *_cell)
     cells[_x][_y] = _cell;
 }
 
+vector<vector<Cell *>> *Board::GetCells()
+{
+    return &this->cells;
+}
+
 void Board::InitializeBoard()
 {
     for (int i = 0; i < this->width; i++)
@@ -35,23 +38,17 @@ void Board::InitializeBoard()
         vector<Cell *> row;
         for (int j = 0; j < this->height; j++)
         {
-            if (rand() % 10 == 0)
+            if (rand() % 20 == 0)
             {
-                row.push_back(new RocketCell());
+                row.push_back(new RocketCell(i, j));
             }
-            else if (rand() % 10 == 0)
+            else if (rand() % 20 == 0)
             {
-                row.push_back(new BombCell());
+                row.push_back(new BombCell(i, j));
             }
             else
             {
-                int randomNormal = rand() % 3;
-                if (randomNormal == 0)
-                    row.push_back(new NormalCell('A'));
-                else if (randomNormal == 1)
-                    row.push_back(new NormalCell('S'));
-                else
-                    row.push_back(new NormalCell('U'));
+                row.push_back(new NormalCell(i, j));
             }
         }
         cells.push_back(row);
@@ -60,7 +57,7 @@ void Board::InitializeBoard()
 
 void Board::PrintBoard()
 {
-    cout << "      01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10\n\n";
+    cout << "      01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10   X\n\n";
 
     for (int i = 0; i < GetWidth(); i++)
     {
@@ -94,7 +91,7 @@ void Board::PrintBoard()
         }
         cout << endl;
     }
-    cout << endl;
+    cout << "  Y" << endl;
 }
 
 bool Board::CanPopCell(string *callback, int _x, int _y, char _value)
@@ -126,10 +123,18 @@ void Board::PopCell(int _x, int _y, char _value)
     if (_x < 0 || _x >= GetWidth() || _y < 0 || _y >= GetHeight())
         return;
 
-    if (GetCell(_x, _y)->GetValue() != _value)
-        return;
+    char value = GetCell(_x, _y)->GetValue();
+    if (value != _value)
+    {
+        if (value == '*')
+            GetCell(_x, _y)->Pop(GetCells(), _x, _y);
+        if (value == '^')
+            GetCell(_x, _y)->Pop(GetCells(), _x, _y);
 
-    GetCell(_x, _y)->Pop();
+        return;
+    }
+
+    GetCell(_x, _y)->Pop(GetCells(), _x, _y);
 
     PopCell(_x - 1, _y, _value);
     PopCell(_x + 1, _y, _value);
@@ -139,21 +144,59 @@ void Board::PopCell(int _x, int _y, char _value)
 
 void Board::UpdateBoard()
 {
-    // relocate all empty cells with the cells above them
-    for (int i = 0; i < GetWidth(); i++)
+    bool isEmpty = true;
+    while (isEmpty)
     {
-        for (int j = 0; j < GetHeight(); j++)
+        // add new cell to the top of the board
+        for (int i = 0; i < GetWidth(); i++)
         {
-            if (GetCell(i, j)->GetValue() == ' ')
+            if (GetCell(0, i)->GetValue() == ' ')
             {
-                for (int k = i; k >= 0; k--)
+                if (rand() % 20 == 0)
                 {
-                    if (k != 0)
+                    SetCell(0, i, new RocketCell(0, i));
+                }
+                else if (rand() % 20 == 0)
+                {
+                    SetCell(0, i, new BombCell(0, i));
+                }
+                else
+                {
+                    SetCell(0, i, new NormalCell(0, i));
+                }
+            }
+        }
+
+        // relocate all empty cells with the cells above them
+        for (int i = 0; i < GetWidth(); i++)
+        {
+            for (int j = 0; j < GetHeight(); j++)
+            {
+                if (GetCell(i, j)->GetValue() == ' ')
+                {
+                    for (int k = i; k >= 0; k--)
                     {
-                        SetCell(k, j, GetCell(k - 1, j));
-                        SetCell(k - 1, j, new NormalCell(' '));
+                        if (k != 0)
+                        {
+                            SetCell(k, j, GetCell(k - 1, j));
+                            SetCell(k - 1, j, new Cell(k - 1, j));
+                        }
                     }
                 }
+            }
+        }
+
+        // check if there is any empty cell
+        for (int j = 0; j < GetHeight(); j++)
+        {
+            if (GetCell(0, j)->GetValue() == ' ')
+            {
+                isEmpty = true;
+                break;
+            }
+            else
+            {
+                isEmpty = false;
             }
         }
     }

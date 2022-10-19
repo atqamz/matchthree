@@ -5,7 +5,6 @@
 #include "RocketCell.h"
 #include <iostream>
 #include <vector>
-
 using namespace std;
 
 class Board
@@ -18,6 +17,8 @@ public:
 
     Cell *GetCell(int _x, int _y);
     void SetCell(int _x, int _y, Cell *_cell);
+
+    vector<vector<Cell *>> *GetCells();
 
     void InitializeBoard();
     void PrintBoard();

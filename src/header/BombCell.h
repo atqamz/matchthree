@@ -2,13 +2,13 @@
 
 #include "Cell.h"
 #include <iostream>
+#include <vector>
+using namespace std;
 
 class BombCell : public Cell
 {
 public:
-    BombCell();
-    BombCell(char _value);
+    BombCell(int _x, int _y, char _value = '*');
 
-    char GetValue();
-    void SetValue(char _value);
+    void Pop(vector<vector<Cell *>> *_cells, int _x, int _y) override;
 };

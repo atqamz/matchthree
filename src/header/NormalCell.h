@@ -6,9 +6,5 @@
 class NormalCell : public Cell
 {
 public:
-    NormalCell();
-    NormalCell(char _value);
-
-    char GetValue();
-    void SetValue(char _value);
+    NormalCell(int _x, int _y);
 };

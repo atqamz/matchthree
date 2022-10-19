@@ -1,18 +1,23 @@
 #include "header/RocketCell.h"
 
-RocketCell::RocketCell() : Cell('^'){};
+RocketCell::RocketCell(int _x, int _y, char _value) : Cell(_x, _y, _value){};
 
-RocketCell::RocketCell(char _value) : Cell(_value)
+void RocketCell::Pop(vector<vector<Cell *>> *_cells, int _x, int _y)
 {
-    this->value = _value;
-};
-
-char RocketCell::GetValue()
-{
-    return this->value;
-};
-
-void RocketCell::SetValue(char _value)
-{
-    this->value = _value;
+    if (rand() % 2 == 0)
+    {
+        // pop horizontal
+        for (int i = 0; i < _cells->size(); i++)
+        {
+            _cells->at(i).at(_y)->SetValue(' ');
+        }
+    }
+    else
+    {
+        // pop vertical
+        for (int i = 0; i < _cells->at(0).size(); i++)
+        {
+            _cells->at(_x).at(i)->SetValue(' ');
+        }
+    }
 };

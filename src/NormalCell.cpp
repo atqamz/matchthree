@@ -1,18 +1,12 @@
 #include "header/NormalCell.h"
 
-NormalCell::NormalCell() : Cell(' '){};
-
-NormalCell::NormalCell(char _value) : Cell(_value)
+NormalCell::NormalCell(int _x, int _y) : Cell(_x, _y)
 {
-    this->value = _value;
-};
-
-char NormalCell::GetValue()
-{
-    return this->value;
-};
-
-void NormalCell::SetValue(char _value)
-{
-    this->value = _value;
+    int randomNormal = rand() % 3;
+    if (randomNormal == 0)
+        this->value = 'A';
+    else if (randomNormal == 1)
+        this->value = 'S';
+    else
+        this->value = 'U';
 };
