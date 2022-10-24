@@ -26,6 +26,8 @@ void Board::SetCell(int _x, int _y, Cell *_cell)
     cells[_x][_y] = _cell;
 }
 
+int Board::Counter = 0;
+
 vector<vector<Cell *>> *Board::GetCells()
 {
     return &this->cells;
@@ -131,10 +133,24 @@ void Board::PopCell(int _x, int _y, char _value)
         if (value == '^')
             GetCell(_x, _y)->Pop(GetCells(), _x, _y);
 
+        Counter = 0;
         return;
     }
 
     GetCell(_x, _y)->Pop(GetCells(), _x, _y);
+    Counter++;
+
+    if (Counter >= 5)
+    {
+        cout << Counter << endl;
+        Counter = 0;
+    }
+
+    if (Counter >= 6)
+    {
+        cout << Counter << endl;
+        Counter = 0;
+    }
 
     PopCell(_x - 1, _y, _value);
     PopCell(_x + 1, _y, _value);
@@ -152,11 +168,11 @@ void Board::UpdateBoard()
         {
             if (GetCell(0, i)->GetValue() == ' ')
             {
-                if (rand() % 20 == 0)
+                if (rand() % 50 == 0)
                 {
                     SetCell(0, i, new RocketCell(0, i));
                 }
-                else if (rand() % 20 == 0)
+                else if (rand() % 50 == 0)
                 {
                     SetCell(0, i, new BombCell(0, i));
                 }
