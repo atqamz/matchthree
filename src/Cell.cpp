@@ -37,7 +37,8 @@ void Cell::SetValue(char _value)
     this->value = _value;
 };
 
-void Cell::Pop(vector<vector<Cell *>> *_cells, int _x, int _y)
+void Cell::Pop(vector<vector<Cell *>> *_cells, int _x, int _y, Player *_player)
 {
-    SetValue(' ');
+    _cells->at(_x).at(_y)->SetValue(' ');
+    _player->IncrementScore();
 };

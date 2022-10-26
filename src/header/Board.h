@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Player.h"
 #include "NormalCell.h"
 #include "BombCell.h"
 #include "RocketCell.h"
@@ -18,24 +19,25 @@ public:
     Cell *GetCell(int _x, int _y);
     void SetCell(int _x, int _y, Cell *_cell);
 
-    static int Counter;
-    // int GetCounter();
-
     vector<vector<Cell *>> *GetCells();
+
+    int GetCounter();
+    void IncrementCounter();
+    void ResetCounter();
 
     void InitializeBoard();
     void PrintBoard();
 
+    bool CheckSameCell(int _x, int _y, char _value);
     bool CanPopCell(string *callback, int _x, int _y, char _value);
-    void PopCell(int _x, int _y, char _value);
+    void PopCell(Player *_player, int _x, int _y, char _value);
 
     void UpdateBoard();
-
-    // void IncrementCounter();
-    // void ResetCounter();
 
 private:
     int width;
     int height;
     vector<vector<Cell *>> cells;
+
+    int counter;
 };

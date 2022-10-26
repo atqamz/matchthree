@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Player.h"
 #include <iostream>
 #include <vector>
 using namespace std;
@@ -16,7 +17,7 @@ public:
     char GetValue();
     void SetValue(char _value);
 
-    virtual void Pop(vector<vector<Cell *>> *_cells, int _x, int _y);
+    virtual void Pop(vector<vector<Cell *>> *_cells, int _x, int _y, Player *_player);
 
 protected:
     int x;

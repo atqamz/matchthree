@@ -26,11 +26,24 @@ void Board::SetCell(int _x, int _y, Cell *_cell)
     cells[_x][_y] = _cell;
 }
 
-int Board::Counter = 0;
-
 vector<vector<Cell *>> *Board::GetCells()
 {
     return &this->cells;
+}
+
+int Board::GetCounter()
+{
+    return this->counter;
+}
+
+void Board::IncrementCounter()
+{
+    this->counter++;
+}
+
+void Board::ResetCounter()
+{
+    this->counter = 0;
 }
 
 void Board::InitializeBoard()
@@ -40,11 +53,11 @@ void Board::InitializeBoard()
         vector<Cell *> row;
         for (int j = 0; j < this->height; j++)
         {
-            if (rand() % 20 == 0)
+            if (rand() % 50 == 0)
             {
                 row.push_back(new RocketCell(i, j));
             }
-            else if (rand() % 20 == 0)
+            else if (rand() % 50 == 0)
             {
                 row.push_back(new BombCell(i, j));
             }
@@ -96,66 +109,90 @@ void Board::PrintBoard()
     cout << "  Y" << endl;
 }
 
+bool Board::CheckSameCell(int _x, int _y, char _value)
+{
+    if (_x < 0 || _x >= GetWidth() || _y < 0 || _y >= GetHeight())
+        return false;
+
+    char value = GetCell(_x, _y)->GetValue();
+    if (value == ' ')
+        return false;
+    else if (value != _value)
+        return false;
+    else
+    {
+        if (GetCounter() >= 3)
+            return true;
+        else
+            IncrementCounter();
+    }
+
+    return CheckSameCell(_x + 1, _y, _value) || CheckSameCell(_x - 1, _y, _value) || CheckSameCell(_x, _y + 1, _value) || CheckSameCell(_x, _y - 1, _value);
+}
+
 bool Board::CanPopCell(string *callback, int _x, int _y, char _value)
 {
-    // if ((_x - 1 >= 0 &&
-    //      GetCell(_x - 1, _y)->GetValue() != _value) ||
-    //     (_x + 1 < GetWidth() &&
-    //      GetCell(_x + 1, _y)->GetValue() != _value) ||
-    //     (_y - 1 >= 0 &&
-    //      GetCell(_x, _y - 1)->GetValue() != _value) ||
-    //     (_y + 1 < GetHeight() &&
-    //      GetCell(_x, _y + 1)->GetValue() != _value))
-    // {
-    //     *callback = "No adjacent cell with the same value";
-    //     return false;
-    // }
-
     if (GetCell(_x, _y)->GetValue() == ' ')
     {
         *callback = "Cell is empty";
+
         return false;
     }
 
+    if (!CheckSameCell(_x, _y, _value))
+    {
+        *callback = "No same cell";
+
+        return false;
+    }
+
+    ResetCounter();
     return true;
 }
 
-void Board::PopCell(int _x, int _y, char _value)
+void Board::PopCell(Player *_player, int _x, int _y, char _value)
 {
     if (_x < 0 || _x >= GetWidth() || _y < 0 || _y >= GetHeight())
         return;
 
     char value = GetCell(_x, _y)->GetValue();
-    if (value != _value)
+    if (value == ' ')
+        return;
+    else if (value != _value)
     {
-        if (value == '*')
-            GetCell(_x, _y)->Pop(GetCells(), _x, _y);
-        if (value == '^')
-            GetCell(_x, _y)->Pop(GetCells(), _x, _y);
+        // there is two way to approach this, check the latest is a bomb or rocket or using counter
 
-        Counter = 0;
+        // this method is using lastest cell
+        if (value == '*')
+            GetCell(_x, _y)->Pop(GetCells(), _x, _y, _player);
+        else if (value == '^')
+            GetCell(_x, _y)->Pop(GetCells(), _x, _y, _player);
+
+        // and this method is using counter
+        if (GetCounter() >= 5)
+        {
+            SetCell(_x, _y, new BombCell(_x, _y));
+            GetCell(_x, _y)->Pop(GetCells(), _x, _y, _player);
+        }
+        else if (GetCounter() >= 6)
+        {
+            SetCell(_x, _y, new RocketCell(_x, _y));
+            GetCell(_x, _y)->Pop(GetCells(), _x, _y, _player);
+        }
+
+        ResetCounter();
         return;
     }
-
-    GetCell(_x, _y)->Pop(GetCells(), _x, _y);
-    Counter++;
-
-    if (Counter >= 5)
+    else
     {
-        cout << Counter << endl;
-        Counter = 0;
+        GetCell(_x, _y)->Pop(GetCells(), _x, _y, _player);
+        IncrementCounter();
     }
 
-    if (Counter >= 6)
-    {
-        cout << Counter << endl;
-        Counter = 0;
-    }
-
-    PopCell(_x - 1, _y, _value);
-    PopCell(_x + 1, _y, _value);
-    PopCell(_x, _y - 1, _value);
-    PopCell(_x, _y + 1, _value);
+    PopCell(_player, _x - 1, _y, _value);
+    PopCell(_player, _x + 1, _y, _value);
+    PopCell(_player, _x, _y - 1, _value);
+    PopCell(_player, _x, _y + 1, _value);
 }
 
 void Board::UpdateBoard()

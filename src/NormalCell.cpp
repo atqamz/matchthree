@@ -6,7 +6,7 @@ NormalCell::NormalCell(int _x, int _y) : Cell(_x, _y)
     if (randomNormal == 0)
         this->value = 'A';
     else if (randomNormal == 1)
-        this->value = 'S';
+        this->value = 'B';
     else
-        this->value = 'U';
+        this->value = 'C';
 };
